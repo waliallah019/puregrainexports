@@ -86,6 +86,7 @@
     "zod": "latest"
   },
   "devDependencies": {
+    "@netlify/next": "^1.4.9",
     "@types/jspdf": "^2.0.0",
     "@types/mongoose": "^5.11.97",
     "@types/node": "^22",
