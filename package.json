@@ -65,7 +65,7 @@
     "multer": "latest",
     "multer-storage-cloudinary": "latest",
     "nanoid": "^5.1.5",
-    "next": "16.0.10",
+    "next": "15.3.2",
     "next-themes": "latest",
     "nodemailer": "^7.0.3",
     "react": "^19",
