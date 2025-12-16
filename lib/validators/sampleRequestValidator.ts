@@ -43,7 +43,7 @@ const createSampleRequestBodySchema = z.object({
   productTypeCategory: optionalString(z.enum(['finished-product', 'raw-leather'])),
   shippingFee: z.number().min(0, 'Shipping fee must be a positive number.'),
   paymentStatus: z.enum(['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'failed', 'refunded']).default('pending').optional(),
-  stripePaymentIntentId: optionalString(z.string()),
+  wiseTransferId: optionalString(z.string()),
   shippingTrackingLink: optionalString(z.string().url("Invalid URL format for tracking link.")),
   shippedAt: z.preprocess((arg) => {
     if (arg === '' || arg === null || arg === undefined) return undefined;

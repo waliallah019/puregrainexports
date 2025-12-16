@@ -30,7 +30,6 @@ import {
   Users,
   TrendingUp,
   Package,
-  MoreHorizontal,
   RefreshCw,
   ChevronDown,
   ChevronUp,
@@ -55,12 +54,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
@@ -697,36 +690,28 @@ export default function AdminCustomManufacturingPage() {
                           {format(new Date(request.createdAt), "MMM dd, yyyy")}
                         </TableCell>
                         <TableCell className="text-center">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                          <div className="flex items-center justify-center gap-2">
                               <Button
                                 variant="ghost"
-                                className="h-8 w-8 p-0 hover:bg-muted"
+                              size="sm"
+                              asChild
+                              className="h-8"
                               >
-                                <MoreHorizontal className="h-4 w-4" />
+                              <Link href={`/admin/custom-manufacturing/${request._id}`}>
+                                <Eye className="h-4 w-4 mr-1" />
+                                View
+                              </Link>
                               </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-40">
-                              <DropdownMenuItem asChild>
-                                <Link
-                                  href={`/admin/custom-manufacturing/${request._id}`}
-                                  className="flex items-center cursor-pointer"
-                                >
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View Details
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleDelete(request._id as string)
-                                }
-                                className="text-destructive hover:text-destructive-foreground hover:bg-destructive/10 cursor-pointer"
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(request._id as string)}
+                              className="h-8 text-destructive hover:text-destructive-foreground hover:bg-destructive/10"
                               >
-                                <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 className="h-4 w-4 mr-1" />
                                 Delete
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))

@@ -12,6 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Mail, Phone, MapPin, Clock, Send, MessageSquare, CheckCircle, X } from "lucide-react"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { PageBanner } from "@/components/layout/page-banner"
 // Note: In a real implementation, you would import toast and axios
 
 export default function ContactPage() {
@@ -125,6 +126,12 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
+      <PageBanner
+        title="Get in Touch"
+        subtitle="Ready to start your leather sourcing journey? Our team is here to help you find the perfect materials and products for your business needs."
+        badge="Contact Us"
+        compact={true}
+      />
       
       {/* Success Message Popup */}
       {showSuccess && (
@@ -163,28 +170,6 @@ export default function ContactPage() {
           </div>
         </div>
       )}
-
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-amber-50 via-background to-amber-50/50 dark:from-amber-950/20 dark:via-background dark:to-amber-950/10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-4 mb-16">
-            <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
-              Contact Us
-            </Badge>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              Get in
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-900 dark:from-amber-400 dark:to-amber-600">
-                {" "}
-                Touch
-              </span>
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Ready to start your leather sourcing journey? Our team is here to help you find the perfect materials and
-              products for your business needs.
-            </p>
-          </div>
-        </div>
-      </section>
 
       {/* Contact Form & Info */}
       <section className="py-20 bg-background flex-grow">

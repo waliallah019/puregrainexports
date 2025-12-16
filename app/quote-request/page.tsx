@@ -6,6 +6,7 @@
 import { Suspense } from 'react'; // <-- Only Suspense here
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageBanner } from "@/components/layout/page-banner";
 import { QuoteRequestFormContent } from './QuoteRequestFormContent'; // <-- Import the new component
 import { Loader2 } from 'lucide-react'; // For the fallback UI
 
@@ -13,6 +14,12 @@ export default function QuoteRequestPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageBanner
+        title="Request a Quote"
+        subtitle="Get detailed pricing and specifications for our premium leather products. Our team will provide you with a comprehensive quote tailored to your business needs."
+        badge="Quote Request"
+        compact={true}
+      />
       {/* Wrap the component that uses useSearchParams with Suspense */}
       <Suspense fallback={
         <div className="min-h-[50vh] flex flex-col items-center justify-center text-xl text-muted-foreground">

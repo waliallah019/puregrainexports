@@ -40,7 +40,6 @@ export function AdminSidebar({ isOpen, onClose }: SidebarProps) {
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Raw-Leather", href: "/admin/raw-leather", icon: Blocks },
-    { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
     { name: "Custom Requests", href: "/admin/custom-manufacturing", icon: Users },
     { name: "Reports", href: "/admin/reports", icon: BarChart },
     { name: "Quotes", href: "/admin/quotes", icon: FileText },

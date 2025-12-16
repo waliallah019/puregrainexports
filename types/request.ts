@@ -33,7 +33,7 @@ export interface ISampleRequest {
   productTypeCategory?: 'finished-product' | 'raw-leather';
   shippingFee: number;
   paymentStatus: SampleRequestStatus;
-  stripePaymentIntentId?: string;
+  wiseTransferId?: string;
   shippingTrackingLink?: string;
   shippedAt?: string;
   createdAt: string;

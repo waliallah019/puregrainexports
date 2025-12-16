@@ -69,6 +69,88 @@
 }
 
 @layer utilities {
+  /* Premium B2B Design Tokens */
+  .text-leather-brown {
+    color: #5c4033;
+  }
+  
+  .bg-leather-brown {
+    background-color: #5c4033;
+  }
+  
+  .border-leather-brown {
+    border-color: #5c4033;
+  }
+  
+  .text-leather-tan {
+    color: #d4a574;
+  }
+  
+  .bg-leather-tan {
+    background-color: #d4a574;
+  }
+  
+  /* Premium gradients */
+  .gradient-leather {
+    background: linear-gradient(135deg, #8b6f47 0%, #5c4033 50%, #3d2817 100%);
+  }
+  
+  .gradient-leather-subtle {
+    background: linear-gradient(135deg, rgba(139, 111, 71, 0.1) 0%, rgba(92, 64, 51, 0.05) 100%);
+  }
+  
+  /* Textured backgrounds */
+  .texture-leather {
+    background-image: 
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(0, 0, 0, 0.02) 10px,
+        rgba(0, 0, 0, 0.02) 20px
+      );
+  }
+  
+  /* Premium shadows */
+  .shadow-leather {
+    box-shadow: 0 4px 20px rgba(92, 64, 51, 0.15), 0 1px 3px rgba(92, 64, 51, 0.1);
+  }
+  
+  .shadow-leather-lg {
+    box-shadow: 0 10px 40px rgba(92, 64, 51, 0.2), 0 4px 10px rgba(92, 64, 51, 0.15);
+  }
+  
+  /* Hover effects */
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(92, 64, 51, 0.2);
+  }
+  
+  /* Form enhancements */
+  .form-field-enhanced {
+    @apply relative;
+  }
+  
+  .form-field-enhanced::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, #8b6f47, #5c4033);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .form-field-enhanced:focus-within::before {
+    opacity: 1;
+  }
+  
   /* Scroll Snap */
   .scroll-snap-section {
     scroll-snap-align: start;
@@ -126,6 +208,33 @@
 
   .animate-fade-in-stagger-4 {
     animation: fadeIn 0.6s ease-out 0.4s both;
+  }
+  
+  /* Micro-interactions */
+  .micro-bounce {
+    transition: transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+  
+  .micro-bounce:active {
+    transform: scale(0.95);
+  }
+  
+  /* Smooth transitions */
+  .transition-premium {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  /* Loading states */
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+  
+  /* Focus states */
+  .focus-premium:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #8b6f47;
+    ring-offset: 2px;
   }
 }
 

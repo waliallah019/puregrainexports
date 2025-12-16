@@ -6,41 +6,27 @@ import Image from "next/image"
 import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { PageBanner } from "@/components/layout/page-banner"
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageBanner
+        title="Crafting Excellence in Leather"
+        subtitle="For over two decades, Pure Grain has been at the forefront of premium leather wholesale, connecting international buyers with the finest raw materials and finished products."
+        badge="About Pure Grain"
+        cta={{ text: "Get in Touch", href: "/contact" }}
+        compact={true}
+      />
       {/* Hero Section */}
-      <section className="py-20 lg:py-32 bg-gradient-to-br from-amber-50 via-background to-amber-50/50 dark:from-amber-950/20 dark:via-background dark:to-amber-950/10">
+      <section className="py-12 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="space-y-4">
-                <Badge
-                  variant="secondary"
-                  className="w-fit bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-                >
-                  About Pure Grain
-                </Badge>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-                  Crafting Excellence in
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-900 dark:from-amber-400 dark:to-amber-600">
-                    {" "}
-                    Leather
-                  </span>
-                </h1>
-                <p className="text-xl text-muted-foreground leading-relaxed">
-                  For over two decades, Pure Grain has been at the forefront of premium leather wholesale, connecting
-                  international buyers with the finest raw materials and finished products.
-                </p>
-              </div>
-              <Button size="lg" className="bg-amber-800 hover:bg-amber-900" asChild>
-                <Link href="/contact">
-                  Get in Touch
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </Button>
+            <div className="space-y-6">
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Our commitment to quality, sustainability, and customer service has earned us partnerships with over 500 businesses across 40 countries. We believe that great leather tells a story, and we're honored to be part of yours.
+              </p>
             </div>
             <div className="relative">
               <Image
@@ -48,7 +34,7 @@ export default function AboutPage() {
                 alt="Pure Grain Workshop"
                 width={800}
                 height={600}
-                className="rounded-2xl shadow-2xl"
+                className="rounded-2xl shadow-2xl w-full h-auto"
               />
             </div>
           </div>

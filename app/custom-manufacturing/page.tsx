@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageBanner } from "@/components/layout/page-banner";
 import { Upload, Send, Clock, Award, Palette, FileText, XCircle, CheckCircle2 } from "lucide-react"; // Added CheckCircle2 for success icon
 
 // --- Form Options (Mirroring backend schema enums where applicable) ---
@@ -285,28 +286,12 @@ export default function CustomManufacturingPage() {
     <div className="min-h-screen bg-background">
       <Toaster position="top-center" reverseOrder={false} /> {/* Toaster for toasts */}
       <Header />
-
-      {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-amber-50 via-background to-amber-50/50 dark:from-amber-950/20 dark:via-background dark:to-amber-950/10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-4 mb-16">
-            <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
-              Custom Manufacturing
-            </Badge>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              Bring Your
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-900 dark:from-amber-400 dark:to-amber-600">
-                {" "}
-                Vision to Life
-              </span>
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Upload your designs and specifications for custom leather products tailored to your brand. From concept to
-              completion, we bring your ideas to reality.
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageBanner
+        title="Bring Your Vision to Life"
+        subtitle="Upload your designs and specifications for custom leather products tailored to your brand. From concept to completion, we bring your ideas to reality."
+        badge="Custom Manufacturing"
+        compact={true}
+      />
 
       {/* Services Overview */}
       <section className="py-20 bg-background">

@@ -153,6 +153,14 @@ export const getFinishedProductsFilterSchema = z.object({
       },
       z.boolean().optional(),
     ),
+    isFeatured: z.preprocess(
+      (val) => {
+        if (val === "true") return true;
+        if (val === "false") return false;
+        return undefined;
+      },
+      z.boolean().optional(),
+    ),
     sampleAvailable: z.preprocess( // NEW FIELD for filtering
       (val) => {
         if (val === "true") return true;

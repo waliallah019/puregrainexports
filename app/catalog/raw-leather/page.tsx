@@ -7,6 +7,7 @@ import RawLeatherCard from '@/components/raw-leather-details/RawLeatherCard';
 import { Badge } from '@/components/ui/badge';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { PageBanner } from '@/components/layout/page-banner';
 import {
   ArrowRight,
   Grid,
@@ -360,27 +361,19 @@ export default function RawLeatherPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageBanner
+        title="Premium Raw Leather"
+        subtitle="Source the finest raw leather materials from trusted suppliers for all your manufacturing needs."
+        badge="Material Sourcing"
+        compact={true}
+      />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-amber-50 via-background to-amber-50/30 py-16 dark:from-amber-950/10 dark:via-background dark:to-amber-950/5 md:py-24">
+      <section className="bg-background py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-16 space-y-6 text-center">
-            <Badge
-              variant="secondary"
-              className="bg-amber-100 px-4 py-2 text-sm text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-            >
-              Material Sourcing
-            </Badge>
-            <h1 className="text-4xl font-bold leading-tight text-foreground sm:text-5xl lg:text-6xl">
-              Premium Raw
-              <span className="bg-gradient-to-r from-amber-600 to-amber-800 bg-clip-text text-transparent dark:from-amber-400 dark:to-amber-600">
-                {' '}
-                Leather
-              </span>
-            </h1>
-            <p className="mx-auto max-w-3xl leading-relaxed text-muted-foreground text-xl">
-              Source the finest raw leather materials from trusted suppliers for all your
-              manufacturing needs.
+          <div className="mb-8 space-y-4 text-center">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Explore our comprehensive selection of premium raw leather materials, available in various types, finishes, and specifications.
             </p>
           </div>
 

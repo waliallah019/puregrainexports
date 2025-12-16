@@ -1,39 +1,78 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Package, Award, Upload, Search, Filter, ArrowRight } from "lucide-react"
-import Image from "next/image"
+import { Package, Award, Upload, Search, Filter, ArrowRight, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { Header } from "@/components/layout/header"
 import { Footer } from "@/components/layout/footer"
+import { PageBanner } from "@/components/layout/page-banner"
+import ProductCard from "@/components/product-details/ProductCard"
+import RawLeatherCard from "@/components/raw-leather-details/RawLeatherCard"
+import { IProduct } from "@/types/product"
+import { IRawLeather } from "@/types/rawLeather"
 
 export default function CatalogPage() {
+  const [featuredProducts, setFeaturedProducts] = useState<IProduct[]>([])
+  const [featuredRawLeather, setFeaturedRawLeather] = useState<IRawLeather[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchFeaturedItems = async () => {
+      setLoading(true)
+      setError(null)
+      
+      try {
+        // Fetch featured finished products
+        const productsRes = await fetch('/api/finished-products?isFeatured=true&limit=8&page=1')
+        if (!productsRes.ok) throw new Error('Failed to load featured products')
+        const productsData = await productsRes.json()
+        const products = productsData.data || []
+        
+        // Fetch featured raw leather
+        const rawLeatherRes = await fetch('/api/raw-leather?isFeatured=true&limit=8&page=1')
+        if (!rawLeatherRes.ok) throw new Error('Failed to load featured raw leather')
+        const rawLeatherData = await rawLeatherRes.json()
+        const rawLeather = rawLeatherData.data || []
+        
+        setFeaturedProducts(products)
+        setFeaturedRawLeather(rawLeather)
+      } catch (err: any) {
+        setError(err.message || 'Failed to load featured items')
+        console.error('Error fetching featured items:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchFeaturedItems()
+  }, [])
+
+  // Combine and limit featured items (prioritize finished products, then raw leather)
+  const allFeaturedItems = [
+    ...featuredProducts.map(p => ({ type: 'product' as const, data: p })),
+    ...featuredRawLeather.map(r => ({ type: 'rawLeather' as const, data: r }))
+  ].slice(0, 8) // Limit to 8 items total
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageBanner
+        title="Browse Our Collection"
+        subtitle="Discover our extensive range of premium raw leather materials and finished products, carefully curated for international wholesale buyers."
+        badge="Product Catalog"
+        cta={{ text: "Request Quote", href: "/quote-request" }}
+        compact={true}
+      />
 
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-amber-50 via-background to-amber-50/50 dark:from-amber-950/20 dark:via-background dark:to-amber-950/10">
+      <section className="py-12 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-4 mb-16">
-            <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
-              Product Catalog
-            </Badge>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              Browse Our
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-900 dark:from-amber-400 dark:to-amber-600">
-                {" "}
-                Collection
-              </span>
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Discover our extensive range of premium raw leather materials and finished products, carefully curated for
-              international wholesale buyers.
-            </p>
-          </div>
-
           {/* Search and Filter */}
           <div className="max-w-4xl mx-auto">
             <Card className="border-0 shadow-lg">
@@ -68,9 +107,11 @@ export default function CatalogPage() {
                       <SelectItem value="sheep">Sheep</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button className="bg-amber-800 hover:bg-amber-900">
+                  <Button className="bg-amber-800 hover:bg-amber-900" asChild>
+                    <Link href="/catalog/finished-products">
                     <Filter className="w-4 h-4 mr-2" />
                     Filter
+                    </Link>
                   </Button>
                 </div>
               </CardContent>
@@ -178,46 +219,59 @@ export default function CatalogPage() {
             <p className="text-xl text-muted-foreground">Popular items from our extensive catalog</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
-              <Card
-                key={item}
-                className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-              >
-                <CardContent className="p-0">
-                  <div className="relative">
-                    <Image
-                      src={`/placeholder.svg?height=200&width=300`}
-                      alt={`Product ${item}`}
-                      width={300}
-                      height={200}
-                      className="w-full h-48 object-cover rounded-t-lg"
-                    />
-                    <Badge className="absolute top-2 right-2 bg-amber-600 text-white">Popular</Badge>
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="h-8 w-8 animate-spin text-amber-600" />
+              <span className="ml-3 text-lg text-muted-foreground">Loading featured products...</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-20">
+              <p className="text-destructive mb-4">{error}</p>
+              <Button onClick={() => window.location.reload()}>Retry</Button>
                   </div>
-                  <div className="p-4 space-y-2">
-                    <h3 className="font-semibold text-foreground">Premium Cowhide Leather</h3>
-                    <p className="text-sm text-muted-foreground">Full-grain, vegetable tanned</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-amber-600 font-medium">MOQ: 50 sq ft</span>
-                      <Button size="sm" variant="outline" asChild>
-                        <Link href={`/catalog/product/${item}`}>View Details</Link>
+          ) : allFeaturedItems.length === 0 ? (
+            <div className="text-center py-20">
+              <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-lg text-muted-foreground mb-4">No featured products available at the moment</p>
+              <Button asChild>
+                <Link href="/catalog/finished-products">
+                  Browse All Products
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Link>
                       </Button>
                     </div>
+          ) : (
+            <>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {allFeaturedItems.map((item, index) => (
+                  <div key={`${item.type}-${item.data._id}`}>
+                    {item.type === 'product' ? (
+                      <ProductCard product={item.data as IProduct} viewMode="grid" />
+                    ) : (
+                      <RawLeatherCard rawLeather={item.data as IRawLeather} viewMode="grid" />
+                    )}
                   </div>
-                </CardContent>
-              </Card>
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <Button size="lg" className="bg-amber-800 hover:bg-amber-900" asChild>
-              <Link href="/catalog/all">
-                View All Products
+              <div className="text-center mt-12 space-y-4">
+                <Button size="lg" className="bg-amber-800 hover:bg-amber-900 hover:scale-105 transition-all" asChild>
+                  <Link href="/catalog/finished-products">
+                    View All Finished Products
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                </Button>
+                <div>
+                  <Button size="lg" variant="outline" className="border-amber-800 text-amber-800 hover:bg-amber-50 dark:border-amber-400 dark:text-amber-400 dark:hover:bg-amber-950/20" asChild>
+                    <Link href="/catalog/raw-leather">
+                      Browse Raw Materials
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
           </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 

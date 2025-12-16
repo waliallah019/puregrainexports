@@ -6,8 +6,10 @@ import { Button } from '@/components/ui/button';
 import ProductCard from '@/components/product-details/ProductCard';
 // import ProductFilters from '@/components/catalog/ProductFilters'; // Keep if used for other filters
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { PageBanner } from '@/components/layout/page-banner';
 import {
   ArrowRight,
   Grid,
@@ -19,6 +21,9 @@ import {
   X,
   Tag,
   Box, // Generic icon for dynamic product types
+  ChevronRight,
+  Upload,
+  CheckCircle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
@@ -300,35 +305,58 @@ export default function FinishedProductsPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <PageBanner
+        title="Finest Leather Goods"
+        subtitle="Discover our curated collection of premium leather products, each piece crafted with decades of expertise and unwavering attention to detail."
+        badge="Premium Collection"
+        compact={true}
+      />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-amber-50 via-background to-amber-50/30 py-16 dark:from-amber-950/10 dark:via-background dark:to-amber-950/5 md:py-24">
+      {/* Hero Section - Enhanced */}
+      <section className="bg-gradient-to-br from-amber-50/30 via-background to-amber-50/20 dark:from-amber-950/5 dark:via-background dark:to-amber-950/5 py-12 border-b">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-16 space-y-6 text-center">
-            <Badge
-              variant="secondary"
-              className="bg-amber-100 px-4 py-2 text-sm text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-            >
-              Premium Collection
-            </Badge>
-            <h1 className="text-4xl font-bold leading-tight text-foreground sm:text-5xl lg:text-6xl">
-              Finest Leather
-              <span className="bg-gradient-to-r from-amber-600 to-amber-800 bg-clip-text text-transparent dark:from-amber-400 dark:to-amber-600">
-                {' '}
-                Goods
-              </span>
-            </h1>
-            <p className="mx-auto max-w-3xl leading-relaxed text-muted-foreground text-xl">
-              Discover our curated collection of premium leather products, each piece crafted with
-              decades of expertise and unwavering attention to detail.
-            </p>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <Card className="border-0 shadow-leather bg-gradient-to-br from-amber-50 to-background dark:from-amber-950/10 dark:to-background">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-amber-700 dark:text-amber-400 mb-1">
+                  {totalProductsCount}
+                </div>
+                <div className="text-xs text-muted-foreground">Total Products</div>
+              </CardContent>
+            </Card>
+            <Card className="border-0 shadow-leather bg-gradient-to-br from-blue-50 to-background dark:from-blue-950/10 dark:to-background">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-blue-700 dark:text-blue-400 mb-1">
+                  {displayedProducts.length}
+                </div>
+                <div className="text-xs text-muted-foreground">Showing</div>
+              </CardContent>
+            </Card>
+            <Card className="border-0 shadow-leather bg-gradient-to-br from-green-50 to-background dark:from-green-950/10 dark:to-background">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-green-700 dark:text-green-400 mb-1">
+                  {productsFromBackend.filter(p => p.availability === 'In Stock').length}
+                </div>
+                <div className="text-xs text-muted-foreground">In Stock</div>
+              </CardContent>
+            </Card>
+            <Card className="border-0 shadow-leather bg-gradient-to-br from-purple-50 to-background dark:from-purple-950/10 dark:to-background">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-purple-700 dark:text-purple-400 mb-1">
+                  {productsFromBackend.filter(p => p.isFeatured).length}
+                </div>
+                <div className="text-xs text-muted-foreground">Featured</div>
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Search and Filters Section - Moved to Hero */}
+          {/* Search and Filters Section - Enhanced */}
           <div className="mx-auto max-w-6xl">
             {/* Desktop Search and Filters */}
             <div className="hidden lg:block">
-              <div className="rounded-2xl border border-border bg-card/80 backdrop-blur-sm p-6 shadow-lg">
+              <Card className="border-0 shadow-leather-lg bg-card/90 backdrop-blur-sm">
+                <CardContent className="p-6">
                 <div className="space-y-6">
                   {/* Search Bar */}
                   <div className="relative">
@@ -440,7 +468,8 @@ export default function FinishedProductsPage() {
                     )}
                   </div>
                 </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Mobile Search and Filters */}
@@ -673,25 +702,62 @@ export default function FinishedProductsPage() {
           )}
         </div>
 
-        {/* Call to Custom Manufacturing */}
-        <div className="mb-16 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-amber-100 p-12 text-center dark:border-amber-800 dark:from-amber-950/20 dark:to-amber-900/20">
-          <h3 className="mb-4 text-3xl font-bold text-foreground">Need Something Unique?</h3>
-          <p className="mx-auto mb-8 max-w-2xl text-lg text-muted-foreground">
-            Can't find exactly what you're looking for? Our master craftsmen can create bespoke
-            leather goods tailored to your exact specifications with the same premium quality and
-            meticulous attention to detail.
-          </p>
-          <Button
-            size="lg"
-            asChild
-            className="bg-amber-700 px-8 py-3 text-white hover:bg-amber-800"
-          >
-            <Link href="/custom-manufacturing">
-              Explore Custom Manufacturing
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
+        {/* Call to Custom Manufacturing - Enhanced */}
+        <Card className="mb-16 border-0 shadow-leather-lg bg-gradient-to-br from-amber-50 via-amber-100/50 to-amber-50 dark:from-amber-950/20 dark:via-amber-900/10 dark:to-amber-950/20 overflow-hidden relative">
+          <div className="absolute inset-0 opacity-5 texture-leather" />
+          <CardContent className="p-12 text-center relative z-10">
+            <div className="max-w-3xl mx-auto space-y-6">
+              <div className="flex justify-center">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center">
+                  <Upload className="w-8 h-8 text-white" />
+                </div>
+              </div>
+              <h3 className="text-3xl sm:text-4xl font-bold text-foreground">Need Something Unique?</h3>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Can't find exactly what you're looking for? Our master craftsmen can create bespoke
+                leather goods tailored to your exact specifications with the same premium quality and
+                meticulous attention to detail.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <Button
+                  size="lg"
+                  asChild
+                  className="bg-amber-800 hover:bg-amber-900 dark:bg-amber-700 dark:hover:bg-amber-800 px-8 py-6 text-lg shadow-leather-lg hover:scale-105 transition-all micro-bounce"
+                >
+                  <Link href="/custom-manufacturing">
+                    Explore Custom Manufacturing
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  asChild
+                  className="border-2 border-amber-800 text-amber-800 hover:bg-amber-50 dark:border-amber-400 dark:text-amber-400 dark:hover:bg-amber-950/20 px-8 py-6 text-lg hover:scale-105 transition-all"
+                >
+                  <Link href="/quote-request">
+                    Request Custom Quote
+                    <ChevronRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="flex flex-wrap items-center justify-center gap-6 pt-6 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span>Flexible MOQ</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span>4-8 Week Turnaround</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span>Quality Guaranteed</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <Footer />

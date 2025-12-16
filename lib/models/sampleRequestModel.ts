@@ -39,7 +39,7 @@ export interface ISampleRequest extends Document {
   productTypeCategory?: 'finished-product' | 'raw-leather';
   shippingFee: number;
   paymentStatus: PaymentStatus;
-  stripePaymentIntentId?: string;
+  wiseTransferId?: string;
   paymentError?: PaymentError;
   shippedAt?: Date;
   shippingTrackingLink?: string;
@@ -75,7 +75,7 @@ const sampleRequestSchema: Schema<ISampleRequest> = new Schema<ISampleRequest>({
     enum: ['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled', 'failed', 'refunded'],
     default: 'pending'
   },
-  stripePaymentIntentId: { type: String },
+  wiseTransferId: { type: String },
   paymentError: {
     code: { type: String },
     message: { type: String },
@@ -84,7 +84,7 @@ const sampleRequestSchema: Schema<ISampleRequest> = new Schema<ISampleRequest>({
   shippingTrackingLink: { type: String, trim: true },
 }, { timestamps: true });
 
-sampleRequestSchema.index({ stripePaymentIntentId: 1 }, { unique: true, sparse: true });
+sampleRequestSchema.index({ wiseTransferId: 1 }, { unique: true, sparse: true });
 // FIX: Add index for requestNumber
 sampleRequestSchema.index({ requestNumber: 1 }, { unique: true });
 

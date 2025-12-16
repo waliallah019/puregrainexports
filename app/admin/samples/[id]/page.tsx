@@ -237,7 +237,7 @@ export default function AdminSingleSamplePage() {
               <h3 className="text-lg font-semibold flex items-center gap-2"><DollarSign className="h-5 w-5" /> Payment Details</h3>
               <p><strong>Shipping Fee:</strong> ${sampleRequest.shippingFee.toFixed(2)} USD</p>
               <p><strong>Payment Status:</strong> {getStatusBadge(sampleRequest.paymentStatus)}</p>
-              {sampleRequest.stripePaymentIntentId && <p><strong>Stripe Intent ID:</strong> <span className="text-xs text-muted-foreground">{sampleRequest.stripePaymentIntentId}</span></p>}
+              {sampleRequest.wiseTransferId && <p><strong>Wise Transfer ID:</strong> <span className="text-xs text-muted-foreground">{sampleRequest.wiseTransferId}</span></p>}
               {sampleRequest.paymentError && (
                 <p className="text-red-500"><strong>Payment Error:</strong> {sampleRequest.paymentError.message} (Code: {sampleRequest.paymentError.code})</p>
               )}

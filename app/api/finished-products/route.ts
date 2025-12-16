@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
       isActive: query.isActive,
       isArchived: query.isArchived, // This is crucial and correctly passed
       sampleAvailable: query.sampleAvailable, // Ensure this is also passed
+      isFeatured: query.isFeatured, // Filter for featured products
     };
 
     const page = query.page;

@@ -14,19 +14,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { Package, Send, CheckCircle, Truck, CreditCard } from "lucide-react";
+import { PageBanner } from "@/components/layout/page-banner";
+import { FormSection } from "@/components/forms/form-section";
+import { EnhancedFormField, EnhancedInput, EnhancedSelect, EnhancedTextarea } from "@/components/forms/enhanced-form-field";
+import { Package, Send, CheckCircle, Truck, CreditCard, Building2, User, Mail, Phone, MapPin, Globe, Clock, Award, DollarSign } from "lucide-react";
 
-// Stripe imports
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import CheckoutForm from '@/components/sample-request/CheckoutForm';
+// Wise Transfer imports
+import WisePaymentInstructions from '@/components/sample-request/WisePaymentInstructions';
 
 import { IProduct } from '@/types/product';
 import { IRawLeather } from '@/types/rawLeather';
 // Import types if they are still needed here and not solely in shippingConfig
 import {
-  SampleRequestItemType, Urgency, BusinessType, IntendedUse, ExpectedVolume
+  SampleRequestItemType, Urgency, BusinessType, IntendedUse
 } from '@/types/request';
+import { ExpectedVolume } from '@/lib/models/sampleRequestModel';
 
 // --- IMPORTANT CHANGES HERE ---
 // Import getShippingFeeInCents, getShippingFeeInDollars, and the new 'countries' array
@@ -45,8 +47,7 @@ import {
   futureVolumes
 } from '@/lib/config/shippingConfig'; // Ensure this path is correct
 
-// Make sure to load your Stripe publishable key outside of a component's render
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+// Wise Transfer configuration
 
 // Create a separate component for the form content that uses useSearchParams
 function SampleRequestForm() {
@@ -54,9 +55,10 @@ function SampleRequestForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [transferId, setTransferId] = useState<string | null>(null);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [currentShippingFee, setCurrentShippingFee] = useState(0);
+  const [paymentInstructions, setPaymentInstructions] = useState<any>(null);
 
   const [formData, setFormData] = useState({
     companyName: '',
@@ -208,25 +210,28 @@ function SampleRequestForm() {
     setErrors({}); // Clear errors before attempting payment initiation
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/sample-requests/create-payment-intent`, {
-        amount: getShippingFeeInCents(formData.country),
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API_URL}/sample-requests/create-wise-transfer`, {
+        amount: currentShippingFee,
         currency: 'usd',
         country: formData.country,
+        email: formData.email,
+        contactPerson: formData.contactPerson,
+        companyName: formData.companyName,
         metadata: {
             requestType: 'sample',
             productId: formData.productId || 'N/A',
             productName: formData.productName || 'N/A',
-            email: formData.email,
         }
       });
 
-      if (response.data.clientSecret) {
-        setClientSecret(response.data.clientSecret);
+      if (response.data.success && response.data.transferId) {
+        setTransferId(response.data.transferId);
+        setPaymentInstructions(response.data.paymentInstructions);
         setShowPaymentForm(true);
-        toast.success(`Proceeding to payment for $${currentShippingFee.toFixed(2)} shipping.`);
+        toast.success(`Payment instructions generated for $${currentShippingFee.toFixed(2)} shipping.`);
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
       } else {
-        toast.error('Failed to initiate payment.');
+        toast.error('Failed to initiate payment transfer.');
       }
     } catch (error: any) {
       console.error('Payment initiation error:', error.response?.data || error.message);
@@ -236,9 +241,9 @@ function SampleRequestForm() {
     }
   };
 
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
+  const handlePaymentSuccess = async (wiseTransferId: string) => {
     setLoading(true);
-    console.log('Payment succeeded, submitting sample request...', { paymentIntentId });
+    console.log('Payment confirmed, submitting sample request...', { wiseTransferId });
 
     try {
       // Clean the payload - remove empty strings and undefined values
@@ -246,11 +251,15 @@ function SampleRequestForm() {
         Object.entries(formData).filter(([, value]) => value !== '' && value !== undefined && value !== null)
       );
 
+      // In test mode, set status to 'pending' instead of 'paid'
+      const isTestMode = wiseTransferId.startsWith('test-transfer-');
+      const paymentStatus = isTestMode ? 'pending' : 'paid';
+
       const payload = {
         ...cleanPayload,
         shippingFee: currentShippingFee,
-        paymentStatus: 'paid',
-        stripePaymentIntentId: paymentIntentId,
+        paymentStatus: paymentStatus,
+        wiseTransferId: wiseTransferId,
       };
 
       console.log('Sending payload to API:', payload);
@@ -316,76 +325,190 @@ function SampleRequestForm() {
   };
 
   return (
-    <section className="py-20 bg-muted/30">
+    <section className="py-12 bg-gradient-to-br from-amber-50/20 via-background to-amber-50/10 dark:from-amber-950/5 dark:via-background dark:to-amber-950/5">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <Card className="border-0 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Package className="w-5 h-5 text-amber-600" />
-                <span>Sample Request Form</span>
+        <div className="max-w-6xl mx-auto">
+          {/* Main Form Card - Enhanced */}
+          <Card className="border-0 shadow-leather-lg bg-card/95 backdrop-blur-sm">
+            <CardHeader className="border-b bg-gradient-to-r from-amber-50/50 to-background dark:from-amber-950/10 dark:to-background">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center">
+                      <Package className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-2xl font-bold text-foreground">
+                        Sample Request Form
               </CardTitle>
-              <CardDescription>
-                Fill out the form below to request samples. You will pay a <span className="font-semibold text-foreground">${currentShippingFee.toFixed(2)} shipping fee</span>.
+                      <CardDescription className="mt-1">
+                        Request samples to verify quality before bulk purchase
               </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-8">
-              {/* Product Pre-fill Info */}
-              {formData.productId && formData.productName && (
-                <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-md text-sm border border-blue-200 dark:border-blue-700">
-                  <div className="font-medium text-blue-800 dark:text-blue-200 flex items-center">
-                    <CheckCircle className="w-4 h-4 mr-2" />
-                    Request for: <span className="font-semibold ml-1">{formData.productName}</span>
-                    {formData.productTypeCategory && <Badge variant="secondary" className="ml-2 bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">{formData.productTypeCategory === 'finished-product' ? 'Finished Product' : 'Raw Leather'}</Badge>}
+                    </div>
                   </div>
                 </div>
+                <Badge className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100 px-3 py-1">
+                  Shipping: ${currentShippingFee.toFixed(2)}
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 space-y-6">
+              {/* Product Pre-fill Info - Enhanced */}
+              {formData.productId && formData.productName && (
+                <Card className="bg-gradient-to-r from-blue-50 to-amber-50 dark:from-blue-950/30 dark:to-amber-950/20 border-blue-200 dark:border-blue-800 shadow-leather">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                          <CheckCircle className="w-5 h-5 text-blue-700 dark:text-blue-400" />
+                  </div>
+                        <div>
+                          <div className="font-semibold text-foreground flex items-center gap-2">
+                            Request for: <span className="text-blue-700 dark:text-blue-400">{formData.productName}</span>
+                            {formData.productTypeCategory && (
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
+                                {formData.productTypeCategory === 'finished-product' ? 'Finished Product' : 'Raw Leather'}
+                              </Badge>
+                            )}
+                </div>
+                          <p className="text-xs text-muted-foreground mt-1">Product details pre-filled from catalog</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               )}
+
+              {/* B2B Info Banner */}
+              <Card className="bg-gradient-to-r from-amber-50 to-amber-100/50 dark:from-amber-950/20 dark:to-amber-900/10 border-amber-200 dark:border-amber-800">
+                <CardContent className="p-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div className="flex flex-col items-center">
+                      <Package className="w-5 h-5 text-amber-700 dark:text-amber-400 mb-1" />
+                      <span className="text-xs text-muted-foreground">MOQ</span>
+                      <span className="text-sm font-semibold text-foreground">50 sq ft</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <DollarSign className="w-5 h-5 text-amber-700 dark:text-amber-400 mb-1" />
+                      <span className="text-xs text-muted-foreground">Shipping</span>
+                      <span className="text-sm font-semibold text-foreground">${currentShippingFee.toFixed(2)}</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <Globe className="w-5 h-5 text-amber-700 dark:text-amber-400 mb-1" />
+                      <span className="text-xs text-muted-foreground">Countries</span>
+                      <span className="text-sm font-semibold text-foreground">40+</span>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <Award className="w-5 h-5 text-amber-700 dark:text-amber-400 mb-1" />
+                      <span className="text-xs text-muted-foreground">Certified</span>
+                      <span className="text-sm font-semibold text-foreground">ISO 9001</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* MAIN FORM */}
               {!showPaymentForm ? (
-                <form onSubmit={handleInitiatePayment} className="space-y-8">
-                  {/* Form fields */}
-                  <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-foreground border-b pb-2">Company Information</h3>
+                <form onSubmit={handleInitiatePayment} className="space-y-6">
+                  {/* Company Information - Enhanced */}
+                  <FormSection
+                    title="Company Information"
+                    icon={Building2}
+                    description="Tell us about your business for B2B processing"
+                    badge="Required"
+                    stats={[
+                      { label: "Response Time", value: "< 24hrs", icon: Clock },
+                      { label: "B2B Verified", value: "Yes", icon: Award }
+                    ]}
+                  >
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="companyName">Company Name <span className="text-red-500">*</span></Label>
-                        <Input
-                          id="companyName" name="companyName" placeholder="Your Company Ltd."
-                          value={formData.companyName} onChange={handleChange}
-                          required className={errors.companyName ? 'border-red-500' : ''}
+                      <EnhancedFormField
+                        id="companyName"
+                        label="Company Name"
+                        required
+                        icon={<Building2 className="w-4 h-4" />}
+                        helperText="Your registered business name"
+                        tooltip="This will be used for invoicing and shipping documentation"
+                        badge="B2B"
+                        error={errors.companyName}
+                        showSuccess={!!formData.companyName && !errors.companyName}
+                      >
+                        <EnhancedInput
+                          id="companyName"
+                          name="companyName"
+                          placeholder="Your Company Ltd."
+                          value={formData.companyName}
+                          onChange={handleChange}
+                          required
+                          error={errors.companyName}
+                          showSuccess={!!formData.companyName && !errors.companyName}
                         />
-                        {errors.companyName && <div className="text-red-500 text-xs mt-1">{errors.companyName}</div>}
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="contactPerson">Contact Person <span className="text-red-500">*</span></Label>
-                        <Input
-                          id="contactPerson" name="contactPerson" placeholder="John Doe"
-                          value={formData.contactPerson} onChange={handleChange}
-                          required className={errors.contactPerson ? 'border-red-500' : ''}
+                      </EnhancedFormField>
+                      
+                      <EnhancedFormField
+                        id="contactPerson"
+                        label="Contact Person"
+                        required
+                        icon={<User className="w-4 h-4" />}
+                        helperText="Primary contact for this order"
+                        error={errors.contactPerson}
+                        showSuccess={!!formData.contactPerson && !errors.contactPerson}
+                      >
+                        <EnhancedInput
+                          id="contactPerson"
+                          name="contactPerson"
+                          placeholder="John Doe"
+                          value={formData.contactPerson}
+                          onChange={handleChange}
+                          required
+                          error={errors.contactPerson}
+                          showSuccess={!!formData.contactPerson && !errors.contactPerson}
                         />
-                        {errors.contactPerson && <div className="text-red-500 text-xs mt-1">{errors.contactPerson}</div>}
+                      </EnhancedFormField>
                       </div>
-                    </div>
+                    
                     <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email Address <span className="text-red-500">*</span></Label>
-                        <Input
-                          id="email" name="email" type="email" placeholder="john@company.com"
-                          value={formData.email} onChange={handleChange}
-                          required className={errors.email ? 'border-red-500' : ''}
+                      <EnhancedFormField
+                        id="email"
+                        label="Email Address"
+                        required
+                        icon={<Mail className="w-4 h-4" />}
+                        helperText="We'll send order confirmations here"
+                        tooltip="Used for order updates and tracking information"
+                        error={errors.email}
+                        showSuccess={!!formData.email && !errors.email}
+                      >
+                        <EnhancedInput
+                          id="email"
+                          name="email"
+                          type="email"
+                          placeholder="john@company.com"
+                          value={formData.email}
+                          onChange={handleChange}
+                          required
+                          error={errors.email}
+                          showSuccess={!!formData.email && !errors.email}
                         />
-                        {errors.email && <div className="text-red-500 text-xs mt-1">{errors.email}</div>}
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input
-                          id="phone" name="phone" type="tel" placeholder="+1 (555) 123-4567"
-                          value={formData.phone} onChange={handleChange}
+                      </EnhancedFormField>
+                      
+                      <EnhancedFormField
+                        id="phone"
+                        label="Phone Number"
+                        icon={<Phone className="w-4 h-4" />}
+                        helperText="Optional - for urgent order updates"
+                        tooltip="Include country code for international numbers"
+                      >
+                        <EnhancedInput
+                          id="phone"
+                          name="phone"
+                          type="tel"
+                          placeholder="+1 (555) 123-4567"
+                          value={formData.phone}
+                          onChange={handleChange}
                         />
+                      </EnhancedFormField>
                       </div>
-                    </div>
-                  </div>
+                  </FormSection>
 
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-foreground border-b pb-2">Shipping Information</h3>
@@ -584,26 +707,15 @@ function SampleRequestForm() {
                   <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center">
                     <CreditCard className="w-5 h-5 mr-2 text-amber-600" /> Complete Payment
                   </h3>
-                  <div className="text-muted-foreground text-sm mb-4">
-                    Please enter your card details to cover the shipping fee of <span className="font-semibold text-foreground">${currentShippingFee.toFixed(2)}</span>.
-                  </div>
-                  {clientSecret && stripePromise && (
-                    <Elements stripe={stripePromise} options={{ clientSecret }}>
-                      <CheckoutForm
-                        clientSecret={clientSecret}
-                        onPaymentSuccess={handlePaymentSuccess}
+                  {transferId && (
+                    <WisePaymentInstructions
+                      transferId={transferId}
                         shippingFee={currentShippingFee}
-                      />
-                    </Elements>
+                      onPaymentConfirmed={handlePaymentSuccess}
+                      onCancel={() => setShowPaymentForm(false)}
+                      paymentInstructions={paymentInstructions}
+                    />
                   )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowPaymentForm(false)}
-                    className="w-full mt-4"
-                  >
-                    Back to Form
-                  </Button>
                 </div>
               )}
 
@@ -655,27 +767,12 @@ export default function SampleRequestPage() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-
-      <section className="py-20 bg-gradient-to-br from-amber-50 via-background to-amber-50/50 dark:from-amber-950/20 dark:via-background dark:to-amber-950/10">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center space-y-4 mb-16">
-            <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
-              Sample Request
-            </Badge>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              Request
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-700 to-amber-900 dark:from-amber-400 dark:to-amber-600">
-                {" "}
-                Samples
-              </span>
-            </h1>
-            <div className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Experience our quality firsthand. Order samples of our leather materials and finished products before
-              placing your bulk order.
-            </div>
-          </div>
-        </div>
-      </section>
+      <PageBanner
+        title="Request Samples"
+        subtitle="Experience our quality firsthand. Order samples of our leather materials and finished products before placing your bulk order."
+        badge="Sample Request"
+        compact={true}
+      />
 
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">

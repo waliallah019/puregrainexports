@@ -1,4 +1,3 @@
-// my-leather-platform/components/product-details/ProductCard.tsx
 "use client";
 
 import React from 'react';
@@ -12,8 +11,12 @@ import {
   Ruler,
   Star,
   Eye,
-  ShoppingCart // Still needed for Sample
-} from 'lucide-react'; // Removed FileText
+  ShoppingCart,
+  TrendingUp,
+  Award,
+  Zap,
+  ChevronRight
+} from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -34,246 +37,200 @@ export default function ProductCard({ product, viewMode = 'grid' }: ProductCardP
     images,
     isFeatured,
     sampleAvailable,
+    pricePerUnit,
+    availability,
     createdAt
   } = product;
 
-  // Grid view (default)
+  // Grid view (default) - Enhanced
   if (viewMode === 'grid') {
     return (
-      <Card className="group overflow-hidden border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-lg hover:border-amber-200 h-full flex flex-col">
+      <Card className="group overflow-hidden border-0 shadow-leather hover-lift transition-premium h-full flex flex-col bg-gradient-to-br from-background to-muted/30">
         <div className="relative overflow-hidden">
           {/* Image */}
-          <div className="aspect-video bg-muted">
+          <div className="aspect-video bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900 dark:to-amber-800 relative">
             {images && images.length > 0 ? (
               <img
                 src={images[0]}
                 alt={name}
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-muted">
-                <Package className="h-12 w-12 text-muted-foreground" />
+              <div className="flex h-full w-full items-center justify-center">
+                <Package className="h-16 w-16 text-amber-600/30" />
               </div>
             )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
 
           {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1">
+          <div className="absolute top-3 left-3 flex flex-wrap gap-2 z-10">
             {isFeatured && (
-              <Badge className="bg-amber-100 text-amber-800 border-amber-200">
-                <Star className="mr-1 h-3 w-3" />
+              <Badge className="bg-gradient-to-r from-amber-600 to-amber-700 text-white border-0 shadow-lg">
+                <Star className="mr-1 h-3 w-3 fill-white" />
                 Featured
               </Badge>
             )}
             {sampleAvailable && (
-              <Badge variant="outline" className="border-green-200 text-green-800 bg-green-50">
+              <Badge className="bg-gradient-to-r from-green-600 to-green-700 text-white border-0 shadow-lg">
                 <ShoppingCart className="mr-1 h-3 w-3" />
-                Sample
+                Sample Available
               </Badge>
             )}
+            {availability === 'In Stock' && (
+              <Badge className="bg-gradient-to-r from-blue-600 to-blue-700 text-white border-0 shadow-lg">
+                <Zap className="mr-1 h-3 w-3" />
+                In Stock
+              </Badge>
+            )}
+          </div>
+
+          {/* Quick View Overlay */}
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-20">
+            <Button
+              size="sm"
+              className="bg-white text-foreground hover:bg-amber-50 shadow-lg"
+              asChild
+            >
+              <Link href={`/catalog/finished-products/${_id}`}>
+                <Eye className="mr-2 h-4 w-4" />
+                Quick View
+              </Link>
+            </Button>
           </div>
         </div>
 
         <CardContent className="p-6 flex flex-col flex-1">
-          <div className="space-y-4 flex-1 flex flex-col">
+          <div className="space-y-4 flex-1">
             {/* Header */}
             <div>
-              <h3 className="text-lg font-semibold text-foreground line-clamp-1">{name}</h3>
-              <p className="text-sm text-muted-foreground">{productType} • {materialUsed}</p>
-            </div>
-
-            {/* Details */}
-            <div className="grid grid-cols-2 gap-3 text-sm">
-              <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{productType}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Ruler className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{dimensions}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Palette className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">{materialUsed}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Eye className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">MOQ: {moq}</span>
+              <h3 className="text-lg font-semibold text-foreground line-clamp-2 mb-1 group-hover:text-amber-700 dark:group-hover:text-amber-400 transition-colors">
+                {name}
+              </h3>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span>{productType}</span>
+                <span>•</span>
+                <span>{materialUsed}</span>
               </div>
             </div>
 
-            {/* Colors - Fixed height container */}
-            <div className="min-h-[32px] flex items-start">
-              {colorVariants && colorVariants.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {colorVariants.slice(0, 3).map((color, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs">
-                      {color}
-                    </Badge>
-                  ))}
-                  {colorVariants.length > 3 && (
-                    <Badge variant="secondary" className="text-xs">
-                      +{colorVariants.length - 3} more
-                    </Badge>
-                  )}
-                </div>
-              )}
+            {/* Key Info Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                <Ruler className="h-4 w-4 text-amber-600" />
+                <span className="text-xs text-muted-foreground">{dimensions || 'N/A'}</span>
+              </div>
+              <div className="flex items-center gap-2 p-2 rounded-lg bg-muted/50">
+                <Palette className="h-4 w-4 text-amber-600" />
+                <span className="text-xs text-muted-foreground">
+                  {colorVariants?.length || 0} Colors
+                </span>
+              </div>
             </div>
 
-            {/* MOQ and Action - Push to bottom */}
-            <div className="flex items-center justify-between pt-2 mt-auto">
-              <div>
-                <div className="text-sm font-medium text-muted-foreground">
-                  Minimum Order
+            {/* MOQ & Pricing */}
+            <div className="space-y-2 pt-2 border-t border-border/50">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Package className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">MOQ:</span>
+                  <span className="text-sm font-semibold text-foreground">{moq || 'N/A'}</span>
                 </div>
-                <div className="text-lg font-bold text-foreground">
-                  {moq}
-                </div>
+                {pricePerUnit && (
+                  <div className="text-right">
+                    <div className="text-xs text-muted-foreground">From</div>
+                    <div className="text-sm font-bold text-amber-700 dark:text-amber-400">
+                      ${pricePerUnit.toFixed(2)}
+                    </div>
+                  </div>
+                )}
               </div>
-              {/* Reverted to original "View Details" button */}
-              <Button size="sm" asChild className="bg-amber-700 text-white hover:bg-amber-800">
-                <Link href={`/catalog/finished-products/${_id}`}>
-                  View Details
-                </Link>
-              </Button>
             </div>
+
+            {/* Action Button */}
+            <Button
+              variant="outline"
+              className="w-full group-hover:bg-amber-50 dark:group-hover:bg-amber-950/20 group-hover:border-amber-300 transition-colors"
+              asChild
+            >
+              <Link href={`/catalog/finished-products/${_id}`}>
+                View Details
+                <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </Button>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  // List view (similar reversion)
+  // List view - Enhanced
   return (
-    <Card className="group overflow-hidden border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-lg hover:border-amber-200">
-      <div className="flex flex-col md:flex-row">
-        {/* Image */}
-        <div className="relative flex-shrink-0 md:w-48">
-          <div className="aspect-video md:aspect-square bg-muted">
-            {images && images.length > 0 ? (
-              <img
-                src={images[0]}
-                alt={name}
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-muted">
-                <Package className="h-12 w-12 text-muted-foreground" />
-              </div>
-            )}
-          </div>
-
-          {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-1">
-            {isFeatured && (
-              <Badge className="bg-amber-100 text-amber-800 border-amber-200">
-                <Star className="mr-1 h-3 w-3" />
-                Featured
-              </Badge>
-            )}
-            {sampleAvailable && (
-              <Badge variant="outline" className="border-green-200 text-green-800 bg-green-50">
-                <ShoppingCart className="mr-1 h-3 w-3" />
-                Sample
-              </Badge>
-            )}
-          </div>
+    <Card className="group overflow-hidden border-0 shadow-leather hover-lift transition-premium">
+      <div className="flex gap-6">
+        <div className="relative w-48 h-48 flex-shrink-0 overflow-hidden rounded-lg">
+          {images && images.length > 0 ? (
+            <img
+              src={images[0]}
+              alt={name}
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-100 to-amber-200 dark:from-amber-900 dark:to-amber-800">
+              <Package className="h-12 w-12 text-amber-600/30" />
+            </div>
+          )}
+          {isFeatured && (
+            <Badge className="absolute top-2 left-2 bg-amber-600 text-white">
+              <Star className="mr-1 h-3 w-3 fill-white" />
+              Featured
+            </Badge>
+          )}
         </div>
 
-        {/* Content */}
-        <div className="flex-1 p-6">
-          <div className="flex flex-col justify-between h-full">
-            <div className="space-y-4">
-              {/* Header */}
+        <CardContent className="p-6 flex-1 flex flex-col justify-between">
+          <div className="space-y-3">
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-1">{name}</h3>
+              <p className="text-sm text-muted-foreground">{productType} • {materialUsed}</p>
+            </div>
+
+            <div className="flex flex-wrap gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <Ruler className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">{dimensions}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Palette className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">{colorVariants?.length || 0} Colors</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Package className="h-4 w-4 text-muted-foreground" />
+                <span className="text-muted-foreground">MOQ: {moq || 'N/A'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-4 border-t border-border/50">
+            {pricePerUnit && (
               <div>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-foreground">{name}</h3>
-                    <p className="text-muted-foreground mt-1">{productType} • {materialUsed}</p>
-                  </div>
-                  <div className="text-right ml-4">
-                    <div className="text-sm font-medium text-muted-foreground">
-                      Minimum Order
-                    </div>
-                    <div className="text-xl font-bold text-foreground">
-                      {moq}
-                    </div>
-                  </div>
+                <div className="text-xs text-muted-foreground">Starting from</div>
+                <div className="text-xl font-bold text-amber-700 dark:text-amber-400">
+                  ${pricePerUnit.toFixed(2)}
                 </div>
               </div>
-
-              {/* Details Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="text-muted-foreground">Type</div>
-                    <div className="font-medium">{productType}</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Ruler className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="text-muted-foreground">Dimensions</div>
-                    <div className="font-medium">{dimensions}</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Palette className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="text-muted-foreground">Material</div>
-                    <div className="font-medium">{materialUsed}</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Colors */}
-              <div className="flex flex-wrap gap-2">
-                {colorVariants && colorVariants.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    <span className="text-sm font-medium text-muted-foreground mr-2">Colors:</span>
-                    {colorVariants.slice(0, 5).map((color, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {color}
-                      </Badge>
-                    ))}
-                    {colorVariants.length > 5 && (
-                      <Badge variant="secondary" className="text-xs">
-                        +{colorVariants.length - 5} more
-                      </Badge>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-2 pt-4">
-              {sampleAvailable && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  asChild
-                  className="flex-1"
-                >
-                  <Link href={`/sample-request?productId=${_id}&productTypeCategory=finished-product`}>
-                    <ShoppingCart className="mr-2 h-4 w-4" />
-                    Request Sample
-                  </Link>
-                </Button>
-              )}
-              {/* Reverted to original "View Details" button */}
-              <Button
-                asChild
-                className={cn("flex-1 bg-amber-700 text-white hover:bg-amber-800", !sampleAvailable && "w-full")}
-              >
-                <Link href={`/catalog/finished-products/${_id}`}>
-                  View Details
-                </Link>
-              </Button>
-            </div>
+            )}
+            <Button
+              className="bg-amber-800 hover:bg-amber-900 dark:bg-amber-700 dark:hover:bg-amber-800"
+              asChild
+            >
+              <Link href={`/catalog/finished-products/${_id}`}>
+                View Details
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
-        </div>
+        </CardContent>
       </div>
     </Card>
   );

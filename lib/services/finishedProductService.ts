@@ -12,6 +12,7 @@ interface FinishedProductFilters {
   isActive?: boolean; // New filter (will be boolean due to Zod preprocess)
   isArchived?: boolean; // NEW FILTER (will be boolean due to Zod preprocess)
   sampleAvailable?: boolean; // NEW FILTER
+  isFeatured?: boolean; // NEW FILTER for featured products
 }
 
 class FinishedProductService {
@@ -96,6 +97,11 @@ class FinishedProductService {
     // Handle sampleAvailable filter
     if (typeof filters.sampleAvailable === "boolean") { // NEW FILTER
       query.sampleAvailable = filters.sampleAvailable;
+    }
+
+    // Handle isFeatured filter
+    if (typeof filters.isFeatured === "boolean") {
+      query.isFeatured = filters.isFeatured;
     }
 
     // --- DEBUGGING isArchived START ---
